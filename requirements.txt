@@ -1,0 +1,7 @@
+Flask==3.0.0
+mnemonic==0.20
+bip32utils==0.3-4
+ecdsa==0.18.0
+bech32==1.2.0
+gunicorn==21.2.0
+

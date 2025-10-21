@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Bitcoin Seed Phrase Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .input-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .words-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .word-input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .word-input-group label {
+            font-weight: 600;
+            color: #555;
+            min-width: 100px;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .word-input-group input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .word-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .word-input-group input.valid {
+            border-color: #4caf50;
+        }
+
+        .word-input-group input.invalid {
+            border-color: #f44336;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-clear {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .phrase-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .phrase-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .phrase-number {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .phrase-item {
+            margin: 10px 0;
+        }
+
+        .phrase-label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .phrase-value {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            border: 1px solid #ddd;
+        }
+
+        .phrase-value.mnemonic {
+            font-size: 1em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe0b2 100%);
+            border: 3px solid #ff9800;
+            border-left: 6px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .warning-box strong {
+            color: #e65100;
+        }
+        
+        .warning-box ul {
+            color: #333;
+        }
+
+        .results-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* Scrollbar styles */
+        .results-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .results-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .words-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Bitcoin Seed Phrase Generator</h1>
+            <p>Генератор валидных seed фраз Bitcoin</p>
+        </div>
+
+        <div class="content">
+            <div class="warning-box">
+                <strong>⚠️ КРИТИЧЕСКИ ВАЖНО:</strong> Эта программа предназначена ТОЛЬКО для образовательных целей!
+                <br><br>
+                <strong style="color: #d32f2f;">🚨 НИКОГДА НЕ ВВОДИТЕ:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Свои реальные seed фразы</li>
+                    <li>Фразы от кошельков с реальными средствами</li>
+                    <li>Любые данные, которые вы используете на практике</li>
+                </ul>
+                <br>
+                <strong>💡 Безопасность:</strong> Используйте только тестовые фразы для обучения!
+                <br>
+                <strong>⚖️ Дисклеймер:</strong> Автор не несет ответственности за любое использование этого ПО.
+            </div>
+
+            <div class="input-section">
+                <h2>Введите первые 11 слов seed фразы</h2>
+                <div class="words-grid" id="wordsGrid">
+                    <!-- Поля для ввода будут созданы динамически -->
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-generate" onclick="generatePhrases()">
+                        🚀 Сгенерировать
+                    </button>
+                    <button class="btn-clear" onclick="clearAll()">
+                        🗑️ Очистить
+                    </button>
+                </div>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2 id="resultsTitle">Сгенерировано 0 валидных фраз</h2>
+                </div>
+                <div class="results-container" id="resultsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Создание полей ввода
+        const wordsGrid = document.getElementById('wordsGrid');
+        for (let i = 1; i <= 11; i++) {
+            const div = document.createElement('div');
+            div.className = 'word-input-group';
+            div.innerHTML = `
+                <label>Слово ${i}:</label>
+                <input type="text" id="word${i}" placeholder="введите слово" autocomplete="off">
+            `;
+            wordsGrid.appendChild(div);
+        }
+
+        let wordlist = [];
+
+        // Загрузка словаря BIP39
+        fetch('/wordlist')
+            .then(res => res.json())
+            .then(data => {
+                wordlist = data.words;
+            });
+
+        // Валидация слов при вводе
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('input', function() {
+                const word = this.value.trim().toLowerCase();
+                if (word === '') {
+                    this.classList.remove('valid', 'invalid');
+                } else if (wordlist.includes(word)) {
+                    this.classList.remove('invalid');
+                    this.classList.add('valid');
+                } else {
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                }
+            });
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+            setTimeout(() => {
+                errorDiv.classList.remove('active');
+            }, 5000);
+        }
+
+        function clearAll() {
+            for (let i = 1; i <= 11; i++) {
+                document.getElementById(`word${i}`).value = '';
+                document.getElementById(`word${i}`).classList.remove('valid', 'invalid');
+            }
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+        }
+
+        async function generatePhrases() {
+            const words = [];
+            for (let i = 1; i <= 11; i++) {
+                const word = document.getElementById(`word${i}`).value.trim().toLowerCase();
+                words.push(word);
+            }
+
+            // Проверка на пустые поля
+            if (words.some(w => !w)) {
+                showError('Все 11 полей должны быть заполнены!');
+                return;
+            }
+
+            // Показать прогресс-бар
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.classList.add('active');
+            progressFill.style.width = '10%';
+            progressFill.textContent = '10%';
+
+            // Отключить кнопки
+            document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ words })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.error || 'Ошибка при генерации');
+                    progressBar.classList.remove('active');
+                    document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+                    return;
+                }
+
+                // Обновить прогресс
+                progressFill.style.width = '100%';
+                progressFill.textContent = '100%';
+
+                // Показать результаты
+                displayResults(data.phrases, data.count);
+
+                // Скрыть прогресс-бар
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 1000);
+
+            } catch (error) {
+                showError('Ошибка соединения: ' + error.message);
+                progressBar.classList.remove('active');
+            } finally {
+                document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+            }
+        }
+
+        function displayResults(phrases, count) {
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            resultsTitle.textContent = `Сгенерировано ${count} валидных фраз`;
+            resultsContainer.innerHTML = '';
+
+            phrases.forEach(phrase => {
+                const card = document.createElement('div');
+                card.className = 'phrase-card';
+                card.innerHTML = `
+                    <div class="phrase-number">#${phrase.number}</div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🔑 Мнемоника (12 слов):</span>
+                        <div class="phrase-value mnemonic">${phrase.mnemonic}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">📝 12-е слово:</span>
+                        <div class="phrase-value">${phrase.word12}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🏠 Legacy адрес (m/44'/0'/0'/0/0) - начинается с 1:</span>
+                        <div class="phrase-value">${phrase.address_legacy}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🏠 SegWit адрес (m/49'/0'/0'/0/0) - начинается с 3:</span>
+                        <div class="phrase-value">${phrase.address_segwit}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🏠 Native SegWit адрес (m/84'/0'/0'/0/0) - начинается с bc1:</span>
+                        <div class="phrase-value">${phrase.address_native_segwit}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🔒 Приватный ключ (WIF для Legacy):</span>
+                        <div class="phrase-value">${phrase.private_key}</div>
+                    </div>
+                    
+                    <div class="phrase-item">
+                        <span class="phrase-label">🔓 Публичный ключ:</span>
+                        <div class="phrase-value">${phrase.public_key}</div>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+
+            resultsSection.classList.add('active');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+
