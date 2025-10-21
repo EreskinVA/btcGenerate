@@ -139,6 +139,23 @@ def get_wordlist():
     """Возвращает список всех BIP39 слов для автодополнения"""
     return jsonify({'words': mnemo.wordlist})
 
+@app.route('/wordlist-download')
+def download_wordlist():
+    """Скачать список BIP39 слов с номерами в текстовом формате"""
+    from flask import Response
+    
+    content = "BIP39 Список слов (English)\n"
+    content += "="*50 + "\n\n"
+    
+    for i, word in enumerate(mnemo.wordlist, 1):
+        content += f"{i:4d}. {word}\n"
+    
+    return Response(
+        content,
+        mimetype="text/plain",
+        headers={"Content-disposition": "attachment; filename=bip39_wordlist.txt"}
+    )
+
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("🚀 Bitcoin Seed Phrase Generator")

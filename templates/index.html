@@ -109,6 +109,17 @@
         .word-input-group input.invalid {
             border-color: #f44336;
         }
+        
+        .word-preview {
+            flex: 1;
+            padding: 12px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+            min-width: 150px;
+        }
 
         .button-group {
             display: flex;
@@ -341,7 +352,11 @@
             </div>
 
             <div class="input-section">
-                <h2>Введите первые 11 слов seed фразы</h2>
+                <h2>Введите порядковые номера первых 11 слов seed фразы (1-2048)</h2>
+                <p style="color: #666; margin-bottom: 10px;">Каждое слово BIP39 словаря имеет номер от 1 до 2048. Введите номера слов.</p>
+                <p style="color: #667eea; margin-bottom: 15px;">
+                    📥 <a href="/wordlist-download" style="color: #667eea; text-decoration: underline;">Скачать список всех BIP39 слов с номерами</a>
+                </p>
                 <div class="words-grid" id="wordsGrid">
                     <!-- Поля для ввода будут созданы динамически -->
                 </div>
@@ -372,18 +387,6 @@
     </div>
 
     <script>
-        // Создание полей ввода
-        const wordsGrid = document.getElementById('wordsGrid');
-        for (let i = 1; i <= 11; i++) {
-            const div = document.createElement('div');
-            div.className = 'word-input-group';
-            div.innerHTML = `
-                <label>Слово ${i}:</label>
-                <input type="text" id="word${i}" placeholder="введите слово" autocomplete="off">
-            `;
-            wordsGrid.appendChild(div);
-        }
-
         let wordlist = [];
 
         // Загрузка словаря BIP39
@@ -391,23 +394,50 @@
             .then(res => res.json())
             .then(data => {
                 wordlist = data.words;
+                createInputFields();
             });
 
-        // Валидация слов при вводе
-        document.querySelectorAll('input[type="text"]').forEach(input => {
-            input.addEventListener('input', function() {
-                const word = this.value.trim().toLowerCase();
-                if (word === '') {
-                    this.classList.remove('valid', 'invalid');
-                } else if (wordlist.includes(word)) {
-                    this.classList.remove('invalid');
-                    this.classList.add('valid');
-                } else {
-                    this.classList.remove('valid');
-                    this.classList.add('invalid');
-                }
+        function createInputFields() {
+            const wordsGrid = document.getElementById('wordsGrid');
+            for (let i = 1; i <= 11; i++) {
+                const div = document.createElement('div');
+                div.className = 'word-input-group';
+                div.innerHTML = `
+                    <label>Слово ${i}:</label>
+                    <input type="number" id="word${i}" min="1" max="2048" placeholder="1-2048" autocomplete="off">
+                    <div class="word-preview" id="preview${i}">-</div>
+                `;
+                wordsGrid.appendChild(div);
+            }
+            
+            // Добавляем обработчики после создания полей
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', function() {
+                    updateWordPreview(this);
+                });
             });
-        });
+        }
+
+        function updateWordPreview(input) {
+            const number = parseInt(input.value);
+            const id = input.id.replace('word', '');
+            const preview = document.getElementById('preview' + id);
+            
+            if (isNaN(number) || number < 1 || number > 2048) {
+                preview.textContent = '-';
+                input.classList.remove('valid');
+                if (input.value !== '') {
+                    input.classList.add('invalid');
+                } else {
+                    input.classList.remove('invalid');
+                }
+            } else {
+                const word = wordlist[number - 1];
+                preview.textContent = word || '-';
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            }
+        }
 
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -420,21 +450,34 @@
 
         function clearAll() {
             for (let i = 1; i <= 11; i++) {
-                document.getElementById(`word${i}`).value = '';
-                document.getElementById(`word${i}`).classList.remove('valid', 'invalid');
+                const input = document.getElementById(`word${i}`);
+                const preview = document.getElementById(`preview${i}`);
+                input.value = '';
+                input.classList.remove('valid', 'invalid');
+                preview.textContent = '-';
             }
             document.getElementById('resultsSection').classList.remove('active');
             document.getElementById('errorMessage').classList.remove('active');
         }
 
         async function generatePhrases() {
+            const numbers = [];
             const words = [];
+            
             for (let i = 1; i <= 11; i++) {
-                const word = document.getElementById(`word${i}`).value.trim().toLowerCase();
-                words.push(word);
+                const input = document.getElementById(`word${i}`);
+                const number = parseInt(input.value);
+                
+                if (isNaN(number) || number < 1 || number > 2048) {
+                    showError(`Слово ${i}: введите число от 1 до 2048!`);
+                    return;
+                }
+                
+                numbers.push(number);
+                words.push(wordlist[number - 1]);
             }
 
-            // Проверка на пустые поля
+            // Проверка на пустые поля уже сделана выше
             if (words.some(w => !w)) {
                 showError('Все 11 полей должны быть заполнены!');
                 return;
