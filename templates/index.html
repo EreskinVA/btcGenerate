@@ -269,84 +269,6 @@
             color: #667eea;
             font-weight: 600;
         }
-        
-        .phrase-value.found {
-            background: #c8e6c9;
-            border: 2px solid #4caf50;
-            font-weight: 600;
-        }
-        
-        .found-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-left: 10px;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .balance-display {
-            display: block;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #333;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 700;
-            margin-top: 8px;
-            border: 2px solid #ffa500;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-        }
-        
-        .wallet-info-box {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border: 3px solid #4caf50;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
-        }
-        
-        .wallet-info-title {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #2e7d32;
-            margin-bottom: 15px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .wallet-info-item {
-            margin: 12px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .wallet-info-label {
-            font-weight: 600;
-            color: #555;
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        .wallet-info-value {
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            color: #333;
-            word-break: break-all;
-        }
 
         .error-message {
             background: #ffebee;
@@ -445,37 +367,6 @@
                 <p style="color: #667eea; margin-bottom: 15px;">
                     📥 <a href="/wordlist-download" style="color: #667eea; text-decoration: underline;">Скачать список всех BIP39 слов с номерами</a>
                 </p>
-                
-                <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ff9800; box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);">
-                    <h3 style="margin: 0 0 15px 0; color: #e65100; font-size: 1.2em;">⚙️ Настройки генерации</h3>
-                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                        <label style="font-weight: 600; color: #555; min-width: 200px;">Количество адресов:</label>
-                        <input type="number" id="addressCount" value="20" min="1" max="100" style="width: 100px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
-                        <span style="color: #666; font-size: 0.9em;">адресов на каждый тип (Legacy, SegWit, Native SegWit)</span>
-                    </div>
-                    <p style="color: #666; font-size: 0.85em; margin: 5px 0 0 0;">
-                        💡 Для каждой seed фразы будет сгенерировано N адресов по derivation path (m/44'/0'/0'/0/0, m/44'/0'/0'/0/1, ..., m/44'/0'/0'/0/N-1)
-                    </p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #667eea; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);">
-                    <h3 style="margin: 0 0 15px 0; color: #667eea; font-size: 1.2em;">🔍 Проверка адресов в LMDB базе</h3>
-                    <div style="display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px;">
-                        <label style="font-weight: 600; color: #555; min-width: 140px; display: flex; align-items: center;">Путь к базе:</label>
-                        <input type="text" id="lmdbPathInput" placeholder="/полный/путь/к/папке/с/lmdb" style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; background: white; font-family: monospace;">
-                        <button onclick="checkAddressesInDB()" style="padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); white-space: nowrap;">
-                            🔎 Проверить адреса
-                        </button>
-                    </div>
-                    <p style="color: #666; font-size: 0.9em; margin: 10px 0 0 0;">
-                        💡 Укажите полный путь к папке с LMDB базой. База должна содержать адреса кошельков (ключ) и баланс (значение).
-                        <br>
-                        <span style="font-size: 0.85em;">📂 Примеры путей:</span><br>
-                        <code style="background: white; padding: 2px 6px; border-radius: 3px; margin-right: 10px;">/Users/username/bitcoin_db</code>
-                        <code style="background: white; padding: 2px 6px; border-radius: 3px;">C:\bitcoin\addresses_db</code>
-                    </p>
-                </div>
-                
                 <div class="words-grid" id="wordsGrid">
                     <!-- Поля для ввода будут созданы динамически -->
                 </div>
@@ -614,13 +505,6 @@
                 showError('Все 11 полей должны быть заполнены!');
                 return;
             }
-            
-            // Получаем количество адресов для генерации
-            const addressCount = parseInt(document.getElementById('addressCount').value) || 20;
-            if (addressCount < 1 || addressCount > 100) {
-                showError('Количество адресов должно быть от 1 до 100!');
-                return;
-            }
 
             // Показать прогресс-бар
             const progressBar = document.getElementById('progressBar');
@@ -638,10 +522,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        words: words,
-                        address_count: addressCount
-                    })
+                    body: JSON.stringify({ words })
                 });
 
                 const data = await response.json();
@@ -685,25 +566,6 @@
             phrases.forEach(phrase => {
                 const card = document.createElement('div');
                 card.className = 'phrase-card';
-                
-                // Формируем HTML для Legacy адресов
-                let legacyHTML = '';
-                phrase.addresses_legacy.forEach((addr, idx) => {
-                    legacyHTML += `<div class="phrase-value" data-addr-type="legacy" data-addr-index="${idx}">${addr}</div>`;
-                });
-                
-                // Формируем HTML для SegWit адресов
-                let segwitHTML = '';
-                phrase.addresses_segwit.forEach((addr, idx) => {
-                    segwitHTML += `<div class="phrase-value" data-addr-type="segwit" data-addr-index="${idx}">${addr}</div>`;
-                });
-                
-                // Формируем HTML для Native SegWit адресов
-                let nativeSegwitHTML = '';
-                phrase.addresses_native_segwit.forEach((addr, idx) => {
-                    nativeSegwitHTML += `<div class="phrase-value" data-addr-type="native-segwit" data-addr-index="${idx}">${addr}</div>`;
-                });
-                
                 card.innerHTML = `
                     <div class="phrase-number">#${phrase.number}</div>
                     
@@ -718,22 +580,22 @@
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 Legacy адреса (m/44'/0'/0'/0/0-${phrase.addresses_legacy.length-1}):</span>
-                        ${legacyHTML}
+                        <span class="phrase-label">🏠 Legacy адрес (m/44'/0'/0'/0/0) - начинается с 1:</span>
+                        <div class="phrase-value">${phrase.address_legacy}</div>
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 SegWit адреса (m/49'/0'/0'/0/0-${phrase.addresses_segwit.length-1}):</span>
-                        ${segwitHTML}
+                        <span class="phrase-label">🏠 SegWit адрес (m/49'/0'/0'/0/0) - начинается с 3:</span>
+                        <div class="phrase-value">${phrase.address_segwit}</div>
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 Native SegWit адреса (m/84'/0'/0'/0/0-${phrase.addresses_native_segwit.length-1}):</span>
-                        ${nativeSegwitHTML}
+                        <span class="phrase-label">🏠 Native SegWit адрес (m/84'/0'/0'/0/0) - начинается с bc1:</span>
+                        <div class="phrase-value">${phrase.address_native_segwit}</div>
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🔒 Приватный ключ (WIF для первого Legacy):</span>
+                        <span class="phrase-label">🔒 Приватный ключ (WIF для Legacy):</span>
                         <div class="phrase-value">${phrase.private_key}</div>
                     </div>
                     
@@ -747,162 +609,6 @@
 
             resultsSection.classList.add('active');
             resultsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Функция создания блока с информацией о найденном кошельке
-        function createWalletInfo(addressType, address, balance, mnemonic, privateKey, publicKey) {
-            return `
-                <div class="wallet-info-box">
-                    <div class="wallet-info-title">🎯 Найден кошелек (${addressType})!</div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">💰 Баланс:</span>
-                        <div class="wallet-info-value" style="font-size: 1.3em; color: #f57c00; font-weight: 700;">${balance}</div>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">🏠 Адрес ${addressType}:</span>
-                        <div class="wallet-info-value">${address}</div>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">🔑 Seed фраза (Мнемоника):</span>
-                        <div class="wallet-info-value" style="color: #667eea; font-weight: 600;">${mnemonic}</div>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">🔒 Приватный ключ (WIF):</span>
-                        <div class="wallet-info-value" style="color: #d32f2f; font-weight: 600;">${privateKey}</div>
-                    </div>
-                    <div class="wallet-info-item">
-                        <span class="wallet-info-label">🔓 Публичный ключ:</span>
-                        <div class="wallet-info-value">${publicKey}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function checkAddressesInDB() {
-            const dbPath = document.getElementById('lmdbPathInput').value.trim();
-            
-            if (!dbPath) {
-                showError('Укажите путь к LMDB базе данных!');
-                return;
-            }
-            
-            const resultsSection = document.getElementById('resultsSection');
-            if (!resultsSection.classList.contains('active')) {
-                showError('Сначала сгенерируйте seed фразы!');
-                return;
-            }
-            
-            // Собираем все адреса из результатов
-            const cards = document.querySelectorAll('.phrase-card');
-            if (cards.length === 0) {
-                showError('Нет сгенерированных адресов для проверки!');
-                return;
-            }
-            
-            // Собираем все адреса (Legacy, SegWit, Native SegWit)
-            const allAddresses = [];
-            cards.forEach(card => {
-                // Собираем все адреса с атрибутами data-addr-type
-                const addressValues = card.querySelectorAll('.phrase-value[data-addr-type]');
-                addressValues.forEach(addrEl => {
-                    allAddresses.push(addrEl.textContent.trim());
-                });
-            });
-            
-            try {
-                const response = await fetch('/check-addresses', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        db_path: dbPath,
-                        addresses: allAddresses
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    showError(data.error || 'Ошибка при проверке адресов');
-                    return;
-                }
-                
-                // Отображаем результаты проверки
-                if (data.found > 0) {
-                    // Создаем детальное сообщение
-                    let foundDetails = [];
-                    
-                    // Подсвечиваем найденные адреса и собираем информацию
-                    cards.forEach(card => {
-                        const phraseNumber = card.querySelector('.phrase-number').textContent;
-                        
-                        // Получаем мнемонику и ключи
-                        const mnemonicEl = card.querySelector('.phrase-value.mnemonic');
-                        const mnemonic = mnemonicEl ? mnemonicEl.textContent.trim() : '';
-                        
-                        const allValues = card.querySelectorAll('.phrase-value');
-                        const privateKey = allValues[allValues.length - 2] ? allValues[allValues.length - 2].textContent.trim() : '';
-                        const publicKey = allValues[allValues.length - 1] ? allValues[allValues.length - 1].textContent.trim() : '';
-                        
-                        let foundInCard = false;
-                        let walletInfoHTML = '';
-                        
-                        // Проверяем все адреса с атрибутами data-addr-type
-                        const addressElements = card.querySelectorAll('.phrase-value[data-addr-type]');
-                        addressElements.forEach(addrEl => {
-                            const addr = addrEl.textContent.trim();
-                            const addrType = addrEl.getAttribute('data-addr-type');
-                            const addrIndex = addrEl.getAttribute('data-addr-index');
-                            
-                            if (data.results[addr] && data.results[addr].found) {
-                                addrEl.classList.add('found');
-                                const balance = data.results[addr].value || 'Н/Д';
-                                
-                                let typeLabel = addrType === 'legacy' ? 'Legacy' : 
-                                              addrType === 'segwit' ? 'SegWit' : 'Native SegWit';
-                                
-                                // Формируем детальную информацию
-                                const detailLine = `${phraseNumber} ${typeLabel}[${addrIndex}]: ${balance}
-   📍 Адрес: ${addr}
-   🔑 Seed: ${mnemonic}`;
-                                
-                                foundDetails.push(detailLine);
-                                foundInCard = true;
-                                
-                                if (!walletInfoHTML) {
-                                    walletInfoHTML = createWalletInfo(`${typeLabel} [index ${addrIndex}]`, addr, balance, mnemonic, privateKey, publicKey);
-                                }
-                            }
-                        });
-                        
-                        // Добавляем блок с полной информацией о кошельке
-                        if (foundInCard && walletInfoHTML) {
-                            const infoBox = document.createElement('div');
-                            infoBox.innerHTML = walletInfoHTML;
-                            card.appendChild(infoBox.firstChild);
-                        }
-                    });
-                    
-                    // Показываем детальное сообщение
-                    const message = `🎉🎉🎉 НАЙДЕНО СОВПАДЕНИЙ: ${data.found} из ${data.total} адресов!\n\n` +
-                                  `Найденные кошельки:\n` +
-                                  `${'='.repeat(60)}\n\n` +
-                                  foundDetails.join('\n\n');
-                    alert(message);
-                    
-                    // Прокручиваем к первому найденному
-                    const firstFound = document.querySelector('.phrase-value.found');
-                    if (firstFound) {
-                        firstFound.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else {
-                    alert(`ℹ️ Совпадений не найдено.\n\nПроверено адресов: ${data.total}`);
-                }
-                
-            } catch (error) {
-                showError('Ошибка соединения: ' + error.message);
-            }
         }
     </script>
 </body>

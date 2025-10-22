@@ -3,8 +3,6 @@ from mnemonic import Mnemonic
 from bip32utils import BIP32Key
 import hashlib
 import bech32
-import lmdb
-import os
 
 app = Flask(__name__)
 mnemo = Mnemonic("english")
@@ -57,11 +55,6 @@ def generate():
     try:
         data = request.json
         input_words = [word.strip().lower() for word in data.get('words', [])]
-        address_count = int(data.get('address_count', 20))  # По умолчанию 20 адресов
-        
-        # Валидация
-        if address_count < 1 or address_count > 100:
-            return jsonify({'error': 'Количество адресов должно быть от 1 до 100'}), 400
         
         # Проверка на пустые поля
         if len(input_words) != 11 or any(not word for word in input_words):
@@ -89,48 +82,41 @@ def generate():
                     seed = mnemo.to_seed(full_phrase, passphrase="")
                     master_key = BIP32Key.fromEntropy(seed)
                     
-                    # Генерируем несколько адресов для каждого типа
-                    legacy_addresses = []
-                    segwit_addresses = []
-                    native_segwit_addresses = []
+                    # Legacy адрес (m/44'/0'/0'/0/0)
+                    legacy_key = master_key.ChildKey(44 + 2**31)
+                    legacy_key = legacy_key.ChildKey(0 + 2**31)
+                    legacy_key = legacy_key.ChildKey(0 + 2**31)
+                    legacy_key = legacy_key.ChildKey(0)
+                    legacy_key = legacy_key.ChildKey(0)
                     
-                    for addr_index in range(address_count):
-                        # Legacy адрес (m/44'/0'/0'/0/addr_index)
-                        legacy_key = master_key.ChildKey(44 + 2**31)
-                        legacy_key = legacy_key.ChildKey(0 + 2**31)
-                        legacy_key = legacy_key.ChildKey(0 + 2**31)
-                        legacy_key = legacy_key.ChildKey(0)
-                        legacy_key = legacy_key.ChildKey(addr_index)
-                        legacy_addresses.append(legacy_key.Address())
-                        
-                        # SegWit адрес (m/49'/0'/0'/0/addr_index)
-                        segwit_key = master_key.ChildKey(49 + 2**31)
-                        segwit_key = segwit_key.ChildKey(0 + 2**31)
-                        segwit_key = segwit_key.ChildKey(0 + 2**31)
-                        segwit_key = segwit_key.ChildKey(0)
-                        segwit_key = segwit_key.ChildKey(addr_index)
-                        segwit_addresses.append(pubkey_to_p2sh_p2wpkh_address(segwit_key.PublicKey()))
-                        
-                        # Native SegWit адрес (m/84'/0'/0'/0/addr_index)
-                        native_segwit_key = master_key.ChildKey(84 + 2**31)
-                        native_segwit_key = native_segwit_key.ChildKey(0 + 2**31)
-                        native_segwit_key = native_segwit_key.ChildKey(0 + 2**31)
-                        native_segwit_key = native_segwit_key.ChildKey(0)
-                        native_segwit_key = native_segwit_key.ChildKey(addr_index)
-                        native_segwit_addresses.append(pubkey_to_p2wpkh_address(native_segwit_key.PublicKey()))
+                    legacy_address = legacy_key.Address()
+                    private_key_wif = legacy_key.WalletImportFormat()
+                    public_key_bytes = legacy_key.PublicKey()
+                    public_key_hex = public_key_bytes.hex()
                     
-                    # Для первого адреса получаем ключи
-                    first_legacy_key = master_key.ChildKey(44 + 2**31).ChildKey(0 + 2**31).ChildKey(0 + 2**31).ChildKey(0).ChildKey(0)
-                    private_key_wif = first_legacy_key.WalletImportFormat()
-                    public_key_hex = first_legacy_key.PublicKey().hex()
+                    # SegWit адрес (m/49'/0'/0'/0/0) - начинается с 3
+                    segwit_key = master_key.ChildKey(49 + 2**31)
+                    segwit_key = segwit_key.ChildKey(0 + 2**31)
+                    segwit_key = segwit_key.ChildKey(0 + 2**31)
+                    segwit_key = segwit_key.ChildKey(0)
+                    segwit_key = segwit_key.ChildKey(0)
+                    segwit_address = pubkey_to_p2sh_p2wpkh_address(segwit_key.PublicKey())
+                    
+                    # Native SegWit адрес (m/84'/0'/0'/0/0) - начинается с bc1
+                    native_segwit_key = master_key.ChildKey(84 + 2**31)
+                    native_segwit_key = native_segwit_key.ChildKey(0 + 2**31)
+                    native_segwit_key = native_segwit_key.ChildKey(0 + 2**31)
+                    native_segwit_key = native_segwit_key.ChildKey(0)
+                    native_segwit_key = native_segwit_key.ChildKey(0)
+                    native_segwit_address = pubkey_to_p2wpkh_address(native_segwit_key.PublicKey())
                     
                     valid_phrases.append({
                         'number': count + 1,
                         'mnemonic': full_phrase,
                         'word12': word,
-                        'addresses_legacy': legacy_addresses,
-                        'addresses_segwit': segwit_addresses,
-                        'addresses_native_segwit': native_segwit_addresses,
+                        'address_legacy': legacy_address,
+                        'address_segwit': segwit_address,
+                        'address_native_segwit': native_segwit_address,
                         'private_key': private_key_wif,
                         'public_key': public_key_hex
                     })
@@ -169,67 +155,6 @@ def download_wordlist():
         mimetype="text/plain",
         headers={"Content-disposition": "attachment; filename=bip39_wordlist.txt"}
     )
-
-@app.route('/check-addresses', methods=['POST'])
-def check_addresses():
-    """Проверить адреса в LMDB базе"""
-    try:
-        data = request.json
-        db_path = data.get('db_path', '')
-        addresses = data.get('addresses', [])
-        
-        if not db_path:
-            return jsonify({'error': 'Не указан путь к базе данных'}), 400
-        
-        if not os.path.exists(db_path):
-            return jsonify({'error': f'База данных не найдена: {db_path}'}), 400
-        
-        if not addresses:
-            return jsonify({'error': 'Список адресов пуст'}), 400
-        
-        results = {}
-        found_count = 0
-        
-        try:
-            # Открываем LMDB базу для чтения
-            env = lmdb.open(db_path, readonly=True, lock=False, max_dbs=0)
-            
-            with env.begin() as txn:
-                for addr in addresses:
-                    # Проверяем наличие адреса в базе
-                    # Пробуем разные варианты ключа
-                    found = False
-                    value = None
-                    
-                    # Вариант 1: адрес как есть
-                    key = addr.encode('utf-8')
-                    value = txn.get(key)
-                    
-                    if value is not None:
-                        found = True
-                    
-                    results[addr] = {
-                        'found': found,
-                        'value': value.decode('utf-8') if value else None
-                    }
-                    
-                    if found:
-                        found_count += 1
-            
-            env.close()
-            
-            return jsonify({
-                'success': True,
-                'total': len(addresses),
-                'found': found_count,
-                'results': results
-            })
-            
-        except lmdb.Error as e:
-            return jsonify({'error': f'Ошибка при работе с LMDB: {str(e)}'}), 500
-            
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("\n" + "="*60)
