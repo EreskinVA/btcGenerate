@@ -90,9 +90,8 @@ def generate():
                     legacy_key = legacy_key.ChildKey(0)
                     
                     legacy_address = legacy_key.Address()
-                    private_key_wif = legacy_key.WalletImportFormat()
-                    public_key_bytes = legacy_key.PublicKey()
-                    public_key_hex = public_key_bytes.hex()
+                    legacy_private_key = legacy_key.WalletImportFormat()
+                    legacy_public_key = legacy_key.PublicKey().hex()
                     
                     # SegWit адрес (m/49'/0'/0'/0/0) - начинается с 3
                     segwit_key = master_key.ChildKey(49 + 2**31)
@@ -101,6 +100,8 @@ def generate():
                     segwit_key = segwit_key.ChildKey(0)
                     segwit_key = segwit_key.ChildKey(0)
                     segwit_address = pubkey_to_p2sh_p2wpkh_address(segwit_key.PublicKey())
+                    segwit_private_key = segwit_key.WalletImportFormat()
+                    segwit_public_key = segwit_key.PublicKey().hex()
                     
                     # Native SegWit адрес (m/84'/0'/0'/0/0) - начинается с bc1
                     native_segwit_key = master_key.ChildKey(84 + 2**31)
@@ -109,6 +110,8 @@ def generate():
                     native_segwit_key = native_segwit_key.ChildKey(0)
                     native_segwit_key = native_segwit_key.ChildKey(0)
                     native_segwit_address = pubkey_to_p2wpkh_address(native_segwit_key.PublicKey())
+                    native_segwit_private_key = native_segwit_key.WalletImportFormat()
+                    native_segwit_public_key = native_segwit_key.PublicKey().hex()
                     
                     valid_phrases.append({
                         'number': count + 1,
@@ -117,8 +120,12 @@ def generate():
                         'address_legacy': legacy_address,
                         'address_segwit': segwit_address,
                         'address_native_segwit': native_segwit_address,
-                        'private_key': private_key_wif,
-                        'public_key': public_key_hex
+                        'private_key_legacy': legacy_private_key,
+                        'public_key_legacy': legacy_public_key,
+                        'private_key_segwit': segwit_private_key,
+                        'public_key_segwit': segwit_public_key,
+                        'private_key_native_segwit': native_segwit_private_key,
+                        'public_key_native_segwit': native_segwit_public_key
                     })
                     
                     count += 1

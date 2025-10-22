@@ -580,28 +580,30 @@
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 Legacy адрес (m/44'/0'/0'/0/0) - начинается с 1:</span>
+                        <span class="phrase-label">🏠 Legacy адрес (m/44'/0'/0'/0/0):</span>
                         <div class="phrase-value">${phrase.address_legacy}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔒 Приватный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.private_key_legacy}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔓 Публичный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.public_key_legacy}</div>
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 SegWit адрес (m/49'/0'/0'/0/0) - начинается с 3:</span>
+                        <span class="phrase-label">🏠 SegWit адрес (m/49'/0'/0'/0/0):</span>
                         <div class="phrase-value">${phrase.address_segwit}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔒 Приватный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.private_key_segwit}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔓 Публичный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.public_key_segwit}</div>
                     </div>
                     
                     <div class="phrase-item">
-                        <span class="phrase-label">🏠 Native SegWit адрес (m/84'/0'/0'/0/0) - начинается с bc1:</span>
+                        <span class="phrase-label">🏠 Native SegWit адрес (m/84'/0'/0'/0/0):</span>
                         <div class="phrase-value">${phrase.address_native_segwit}</div>
-                    </div>
-                    
-                    <div class="phrase-item">
-                        <span class="phrase-label">🔒 Приватный ключ (WIF для Legacy):</span>
-                        <div class="phrase-value">${phrase.private_key}</div>
-                    </div>
-                    
-                    <div class="phrase-item">
-                        <span class="phrase-label">🔓 Публичный ключ:</span>
-                        <div class="phrase-value">${phrase.public_key}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔒 Приватный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.private_key_native_segwit}</div>
+                        <span class="phrase-label" style="margin-top: 8px;">🔓 Публичный ключ:</span>
+                        <div class="phrase-value" style="font-size: 0.85em;">${phrase.public_key_native_segwit}</div>
                     </div>
                 `;
                 resultsContainer.appendChild(card);
